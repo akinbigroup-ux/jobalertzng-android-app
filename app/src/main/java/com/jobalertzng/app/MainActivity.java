@@ -21,6 +21,7 @@ import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.webkit.CookieManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
@@ -43,6 +44,8 @@ import androidx.work.NetworkType;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
+
+import com.google.android.gms.ads.MobileAds;
 
 import java.net.URLEncoder;
 import java.util.concurrent.TimeUnit;
@@ -126,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
         header.setPadding(dp(16), dp(10), dp(12), dp(10));
         header.setBackgroundColor(Color.rgb(11, 35, 69));
 
-        // Official JobAlertzNg logo replaces the yellow J.
+        // Official JobAlertzNg logo.
         ImageView logo = new ImageView(this);
         logo.setImageResource(R.drawable.jobalertzng_logo);
         logo.setScaleType(ImageView.ScaleType.FIT_CENTER);
@@ -321,6 +324,16 @@ public class MainActivity extends AppCompatActivity {
         settings.setMixedContentMode(
                 WebSettings.MIXED_CONTENT_NEVER_ALLOW
         );
+
+        // Allow third-party cookies needed by advertising services.
+        CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true);
+
+        // Allow HTML video playback without requiring a tap.
+        settings.setMediaPlaybackRequiresUserGesture(false);
+
+        // Register this WebView with Google's WebView API for Ads.
+        // This must run on the main Android thread.
+        MobileAds.registerWebView(webView);
 
         webView.setBackgroundColor(Color.WHITE);
 
