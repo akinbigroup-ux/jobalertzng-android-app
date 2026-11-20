@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
@@ -117,8 +118,6 @@ public class MainActivity extends AppCompatActivity {
 
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
-
-        // Navy background extends behind Android system bars.
         root.setBackgroundColor(Color.rgb(11, 35, 69));
 
         LinearLayout header = new LinearLayout(this);
@@ -127,13 +126,12 @@ public class MainActivity extends AppCompatActivity {
         header.setPadding(dp(16), dp(10), dp(12), dp(10));
         header.setBackgroundColor(Color.rgb(11, 35, 69));
 
-        TextView logo = new TextView(this);
-        logo.setText("J");
-        logo.setTextColor(Color.rgb(255, 209, 42));
-        logo.setTextSize(25);
-        logo.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
-        logo.setGravity(Gravity.CENTER);
-        logo.setBackground(makeRounded(Color.rgb(16, 45, 86), 12));
+        // Official JobAlertzNg logo replaces the yellow J.
+        ImageView logo = new ImageView(this);
+        logo.setImageResource(R.drawable.jobalertzng_logo);
+        logo.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        logo.setPadding(dp(2), dp(2), dp(2), dp(2));
+        logo.setContentDescription("JobAlertzNg official logo");
 
         header.addView(logo,
                 new LinearLayout.LayoutParams(dp(42), dp(42)));
@@ -286,7 +284,7 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(root);
 
-        // Keep the app content between the Android status and navigation bars.
+        // Keep app content between Android system bars.
         ViewCompat.setOnApplyWindowInsetsListener(root, (view, windowInsets) -> {
 
             Insets systemBars = windowInsets.getInsets(
