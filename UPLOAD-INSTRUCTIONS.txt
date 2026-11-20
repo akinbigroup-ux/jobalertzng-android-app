@@ -1,0 +1,36 @@
+JOBALERTZNG ANDROID APK - UPLOAD INSTRUCTIONS
+
+1. Open your repository:
+   https://github.com/akinbigroup-ux/jobalertzng-android-app
+
+2. Click Add file > Upload files.
+
+3. Extract this ZIP on your computer first.
+
+4. Upload the CONTENTS of the extracted JobAlertzNg_Android_Source folder,
+   including the .github folder and the app folder. Do not upload the outer
+   JobAlertzNg_Android_Source folder as a single nested folder if GitHub's
+   uploader lets you upload the files directly.
+
+5. Enter commit message: Add JobAlertzNg Android app and APK build workflow
+   Then click Commit changes to main.
+
+6. Open the Actions tab in the repository. The workflow named
+   "Build JobAlertzNg Android APK" should start automatically.
+
+7. When it finishes successfully, download the JobAlertzNg-APK artifact
+   from the workflow run, or open Releases and download JobAlertzNg.apk
+   from the "latest-apk" release.
+
+INSTALLATION
+- Download JobAlertzNg.apk to the Android phone.
+- Open it from Downloads.
+- If Android asks, allow the browser or file manager to install unknown apps.
+- Continue installation and open JobAlertzNg.
+- Allow notifications when prompted.
+
+NOTIFICATION LIMITATION
+The app checks the public Blogger feed periodically using Android WorkManager.
+The minimum periodic interval is 15 minutes and Android may defer checks to
+save battery. It is not an instant push notification system. The first run
+sets a baseline and does not notify about old posts.
