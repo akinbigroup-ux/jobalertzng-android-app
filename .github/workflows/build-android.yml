@@ -60,7 +60,7 @@ jobs:
           echo "Android SDK is ready."
 
       - name: Build Android APK
-        run: gradle --no-daemon assembleDebug
+        run: gradle --no-daemon assembleDebug --stacktrace
 
       - name: Prepare APK
         run: |
