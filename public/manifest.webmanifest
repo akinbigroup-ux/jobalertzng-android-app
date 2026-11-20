@@ -1,0 +1,19 @@
+{
+  "id": "/",
+  "name": "JobAlertzNg",
+  "short_name": "JobAlertzNg",
+  "description": "Nigerian job vacancies, career advice, interview experiences and workplace stories.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait",
+  "background_color": "#F5F7FA",
+  "theme_color": "#102D56",
+  "categories": ["business", "education", "productivity"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#102D56">
+  <meta name="description" content="Find Nigerian jobs, career advice, interview experiences and stories from JobAlertzNg.">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="JobAlertzNg">
+  <title>JobAlertzNg — Your next opportunity starts here</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/icons/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="JobAlertzNg home">
+        <span class="brand-mark">J<span>A</span></span>
+        <span class="brand-copy"><strong>JobAlertz<span>Ng</span></strong><small>YOUR NEXT OPPORTUNITY STARTS HERE</small></span>
+      </a>
+      <div class="top-actions">
+        <button class="icon-action" id="refresh-button" type="button" aria-label="Refresh articles" title="Refresh">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4.7 9A7.5 7.5 0 0 1 18 6l2 6M4 17v-5h5m10.3 3A7.5 7.5 0 0 1 6 18l-2-6"/></svg>
+        </button>
+        <button class="alert-button" id="alerts-button" type="button"><span class="alert-dot"></span><span id="alerts-button-text">Enable alerts</span></button>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero-card" aria-label="Welcome">
+        <div class="hero-orbit orbit-one"></div><div class="hero-orbit orbit-two"></div>
+        <div class="hero-kicker"><span></span> OPPORTUNITIES THAT MOVE YOU</div>
+        <h1>Your next opportunity<br><em>starts here.</em></h1>
+        <p>Find new Nigerian jobs, career guidance and stories to help you move forward.</p>
+        <div class="hero-actions">
+          <button type="button" class="hero-primary" id="hero-jobs-button">Explore jobs</button>
+          <button type="button" class="hero-secondary" id="install-button" hidden>Install app</button>
+        </div>
+        <div class="hero-meta"><span class="live-pulse"></span> Fresh updates from JobAlertzNg</div>
+      </section>
+
+      <section class="search-wrap" aria-label="Search articles">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg>
+        <input id="search-input" type="search" placeholder="Search jobs, locations or career advice" autocomplete="off">
+        <button id="clear-search" type="button" aria-label="Clear search" hidden>×</button>
+      </section>
+
+      <section class="quick-links" aria-label="Popular sections">
+        <button type="button" data-quick="jobs">Latest jobs</button>
+        <button type="button" data-quick="career">Career advice</button>
+        <button type="button" data-quick="stories">Job stories</button>
+        <a href="https://www.jobalertz.com.ng/p/deadline-approaching-vacancies.html" target="_blank" rel="noopener">Closing soon</a>
+      </section>
+
+      <section class="feed-section" id="feed-section">
+        <div class="section-heading">
+          <div><span class="section-eyebrow" id="section-eyebrow">THE LATEST</span><h2 id="feed-title">Latest updates</h2><p id="feed-description">New opportunities and useful reads from JobAlertzNg.</p></div>
+          <span class="post-count" id="post-count">Loading</span>
+        </div>
+        <div class="status-line" id="status-line" role="status">Connecting to JobAlertzNg…</div>
+        <div class="post-list" id="post-list"></div>
+        <button type="button" class="load-more" id="load-more" hidden>Load more articles</button>
+      </section>
+
+      <section class="more-section" id="more-section" hidden>
+        <div class="section-heading"><div><span class="section-eyebrow">EXPLORE JOBALERTZNG</span><h2>More sections</h2><p>Go straight to the information you need.</p></div></div>
+        <div class="more-grid">
+          <a href="https://www.jobalertz.com.ng/search/label/Lagos" target="_blank" rel="noopener"><span class="more-icon">L</span><span><b>Lagos jobs</b><small>Opportunities in Lagos</small></span><i>›</i></a>
+          <a href="https://www.jobalertz.com.ng/search/label/Abuja" target="_blank" rel="noopener"><span class="more-icon">A</span><span><b>Abuja jobs</b><small>Opportunities in Abuja</small></span><i>›</i></a>
+          <a href="https://www.jobalertz.com.ng/search/label/Others" target="_blank" rel="noopener"><span class="more-icon">N</span><span><b>Other states</b><small>Jobs across Nigeria</small></span><i>›</i></a>
+          <a href="https://www.jobalertz.com.ng/search/label/Interview%20Experiences" target="_blank" rel="noopener"><span class="more-icon">I</span><span><b>Interview experiences</b><small>Prepare for your next interview</small></span><i>›</i></a>
+          <a href="https://www.jobalertz.com.ng/p/deadline-approaching-vacancies.html" target="_blank" rel="noopener"><span class="more-icon gold">!</span><span><b>Closing soon</b><small>Vacancies nearing their deadline</small></span><i>›</i></a>
+          <a href="https://www.jobalertz.com.ng/p/expired-jobs.html" target="_blank" rel="noopener"><span class="more-icon">E</span><span><b>Expired jobs</b><small>Previously advertised opportunities</small></span><i>›</i></a>
+          <a href="https://www.jobalertz.com.ng/p/beyond-office-series.html" target="_blank" rel="noopener"><span class="more-icon">S</span><span><b>Beyond the Office Series</b><small>Stories from the world of work</small></span><i>›</i></a>
+          <a href="https://www.jobalertz.com.ng/p/contact-us.html" target="_blank" rel="noopener"><span class="more-icon">?</span><span><b>Contact JobAlertzNg</b><small>Get in touch with us</small></span><i>›</i></a>
+        </div>
+        <a class="visit-site" href="https://www.jobalertz.com.ng/" target="_blank" rel="noopener">Visit jobalertz.com.ng <span>↗</span></a>
+      </section>
+
+      <section class="detail-section" id="detail-section" hidden>
+        <button type="button" class="back-button" id="back-to-feed"><span>‹</span> Back to updates</button>
+        <article id="article-detail" class="article-detail"></article>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="Main navigation">
+      <button type="button" class="nav-item active" data-tab="home" aria-current="page">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg><span>Home</span>
+      </button>
+      <button type="button" class="nav-item" data-tab="jobs">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18m-11 0v2h4v-2"/></svg><span>Jobs</span>
+      </button>
+      <button type="button" class="nav-item" data-tab="career">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8M8 11h7"/></svg><span>Career</span>
+      </button>
+      <button type="button" class="nav-item" data-tab="stories">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v18H6.5A2.5 2.5 0 0 1 4 17.5z"/><path d="M4 17.5A2.5 2.5 0 0 1 6.5 15H20M8 7h8M8 10.5h6"/></svg><span>Stories</span>
+      </button>
+      <button type="button" class="nav-item" data-tab="more">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg><span>More</span>
+      </button>
+    </nav>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <footer class="app-footer">JobAlertzNg <span>•</span> Your next opportunity starts here.</footer>
+  </div>
+
+  <!-- Firebase client configuration and SDKs -->
+  <script src="/firebase-config.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-messaging-compat.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>

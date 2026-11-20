@@ -1,0 +1,9 @@
+{
+  "name": "jobalertzng-pwa-notifier",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Scheduled Blogger-to-Firebase Cloud Messaging notifier for the JobAlertzNg installable PWA.",
+  "scripts": {"notify": "node scripts/notify-new-posts.mjs"},
+  "dependencies": {"firebase-admin": "^13.4.0"}
+}
