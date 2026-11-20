@@ -15,7 +15,6 @@
         android:usesCleartextTraffic="false"
         android:supportsRtl="true">
 
-        <!-- Google WebView API for Ads integration -->
         <meta-data
             android:name="com.google.android.gms.ads.INTEGRATION_MANAGER"
             android:value="webview" />
