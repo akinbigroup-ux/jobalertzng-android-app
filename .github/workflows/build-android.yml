@@ -1,0 +1,64 @@
+
+name: Build JobAlertzNg Android APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build installable APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android platform and build tools
+        run: sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Build debug APK
+        run: gradle --no-daemon assembleDebug
+
+      - name: Stage APK
+        run: |
+          mkdir -p dist
+          cp app/build/outputs/apk/debug/app-debug.apk dist/JobAlertzNg.apk
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: JobAlertzNg-APK
+          path: dist/JobAlertzNg.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publish APK release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest-apk
+          name: JobAlertzNg Android App (Latest APK)
+          body: |
+            Installable JobAlertzNg Android APK.
+            This is a sideloadable debug-signed APK, not a Play Store release.
+          files: dist/JobAlertzNg.apk
+          overwrite_files: true
+          make_latest: true
