@@ -584,29 +584,56 @@ public class MainActivity extends AppCompatActivity {
 
         String script =
                 "(function(){"
-                + "if(document.getElementById('janz-native-save-job'))return;"
-                + "var b=document.createElement('button');"
-                + "b.id='janz-native-save-job';"
-                + "b.type='button';"
-                + "b.style.cssText='position:fixed;right:16px;bottom:18px;"
-                + "z-index:2147483647;border:0;border-radius:30px;"
-                + "padding:13px 19px;background:#00834D;color:#fff;"
-                + "font-size:14px;font-weight:700;"
+                + "if(document.getElementById('janz-native-actions'))return;"
+
+                + "var box=document.createElement('div');"
+                + "box.id='janz-native-actions';"
+                + "box.style.cssText='position:fixed;right:12px;bottom:18px;"
+                + "z-index:2147483647;display:flex;gap:8px;"
+                + "align-items:center;';"
+
+                + "var save=document.createElement('button');"
+                + "save.id='janz-native-save-job';"
+                + "save.type='button';"
+                + "save.style.cssText='border:0;border-radius:30px;"
+                + "padding:12px 15px;background:#00834D;color:#fff;"
+                + "font-size:13px;font-weight:700;"
                 + "box-shadow:0 3px 12px rgba(0,0,0,.25);';"
+
+                + "var share=document.createElement('button');"
+                + "share.id='janz-native-share-job';"
+                + "share.type='button';"
+                + "share.innerText='Share ↗';"
+                + "share.style.cssText='border:0;border-radius:30px;"
+                + "padding:12px 15px;background:#102D56;color:#fff;"
+                + "font-size:13px;font-weight:700;"
+                + "box-shadow:0 3px 12px rgba(0,0,0,.25);';"
+
                 + "var title=document.querySelector('h1.post-title, "
                 + "h1.entry-title, .post-title, h1');"
                 + "var jobTitle=title?title.innerText.trim():document.title;"
+
                 + "function update(){"
-                + "try{b.innerText=AndroidSavedJobs.isSaved(location.href)"
-                + "?'Saved ✓':'Save Job ♡';}catch(e){b.innerText='Save Job ♡';}"
+                + "try{save.innerText=AndroidSavedJobs.isSaved(location.href)"
+                + "?'Saved ✓':'Save Job ♡';}"
+                + "catch(e){save.innerText='Save Job ♡';}"
                 + "}"
-                + "b.onclick=function(){"
+
+                + "save.onclick=function(){"
                 + "try{"
                 + "var state=AndroidSavedJobs.toggleJob(jobTitle,location.href);"
-                + "b.innerText=state?'Saved ✓':'Save Job ♡';"
-                + "}catch(e){b.innerText='Unable to save';}"
+                + "save.innerText=state?'Saved ✓':'Save Job ♡';"
+                + "}catch(e){save.innerText='Unable to save';}"
                 + "};"
-                + "document.body.appendChild(b);"
+
+                + "share.onclick=function(){"
+                + "try{AndroidSavedJobs.shareJob(jobTitle,location.href);}"
+                + "catch(e){share.innerText='Unable to share';}"
+                + "};"
+
+                + "box.appendChild(save);"
+                + "box.appendChild(share);"
+                + "document.body.appendChild(box);"
                 + "update();"
                 + "})();";
 
@@ -680,6 +707,22 @@ public class MainActivity extends AppCompatActivity {
             });
 
             return saved;
+        }
+
+        @JavascriptInterface
+        public void shareJob(String title, String url) {
+
+            if (!isJobPostUrl(url)) {
+                return;
+            }
+
+            runOnUiThread(() ->
+                    NativeShareHelper.share(
+                            MainActivity.this,
+                            title,
+                            url
+                    )
+            );
         }
     }
 
