@@ -12,7 +12,9 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.webkit.CookieManager;
 import android.webkit.JavascriptInterface;
@@ -64,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
 
     private WebView webView;
     private ProgressBar progressBar;
-    private FrameLayout contentFrame;
+    private PullToRefreshFrameLayout contentFrame;
     private LinearLayout savedScreen;
     private LinearLayout savedList;
 
@@ -210,7 +212,7 @@ public class MainActivity extends AppCompatActivity {
                         dp(3)
                 ));
 
-        contentFrame = new FrameLayout(this);
+        contentFrame = new PullToRefreshFrameLayout();
 
         webView = new WebView(this);
 
@@ -327,6 +329,112 @@ public class MainActivity extends AppCompatActivity {
         ViewCompat.requestApplyInsets(root);
 
         updateSelectedTab(0);
+    }
+
+    // Pull-to-refresh container.
+    // It intercepts only a downward gesture when the WebView is at the top.
+    private class PullToRefreshFrameLayout extends FrameLayout {
+
+        private float startX;
+        private float startY;
+        private final int touchSlop;
+        private final int refreshDistance;
+        private boolean refreshing = false;
+
+        public PullToRefreshFrameLayout() {
+            super(MainActivity.this);
+
+            touchSlop = ViewConfiguration.get(MainActivity.this)
+                    .getScaledTouchSlop();
+
+            refreshDistance = dp(90);
+        }
+
+        @Override
+        public boolean onInterceptTouchEvent(MotionEvent event) {
+
+            switch (event.getActionMasked()) {
+
+                case MotionEvent.ACTION_DOWN:
+                    startX = event.getX();
+                    startY = event.getY();
+                    break;
+
+                case MotionEvent.ACTION_MOVE:
+
+                    if (refreshing || savedScreenVisible || webView == null) {
+                        return false;
+                    }
+
+                    float distanceY = event.getY() - startY;
+                    float distanceX = event.getX() - startX;
+
+                    if (webView.getScrollY() <= 0
+                            && distanceY > touchSlop
+                            && distanceY > Math.abs(distanceX)) {
+                        return true;
+                    }
+
+                    break;
+            }
+
+            return false;
+        }
+
+        @Override
+        public boolean onTouchEvent(MotionEvent event) {
+
+            switch (event.getActionMasked()) {
+
+                case MotionEvent.ACTION_MOVE:
+                    return true;
+
+                case MotionEvent.ACTION_UP:
+
+                    float pullDistance = event.getY() - startY;
+
+                    if (!refreshing && pullDistance >= refreshDistance) {
+                        refreshCurrentPage();
+                    }
+
+                    return true;
+
+                case MotionEvent.ACTION_CANCEL:
+                    return true;
+            }
+
+            return true;
+        }
+
+        private void refreshCurrentPage() {
+
+            if (refreshing || webView == null) {
+                return;
+            }
+
+            refreshing = true;
+
+            progressBar.setVisibility(View.VISIBLE);
+            progressBar.setProgress(25);
+
+            String currentUrl = webView.getUrl();
+
+            if (isTrustedBlogUrl(currentUrl)) {
+                webView.reload();
+            } else {
+                loadPage(HOME, "Home");
+            }
+
+            Toast.makeText(
+                    MainActivity.this,
+                    "Refreshing...",
+                    Toast.LENGTH_SHORT
+            ).show();
+        }
+
+        public void finishRefresh() {
+            refreshing = false;
+        }
     }
 
     private LinearLayout buildSavedScreen() {
@@ -558,6 +666,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
+
+                contentFrame.finishRefresh();
                 injectSaveJobButton();
             }
         });
