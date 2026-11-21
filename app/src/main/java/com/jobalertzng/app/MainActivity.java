@@ -14,17 +14,20 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.PopupMenu;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.webkit.CookieManager;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.PopupMenu;
+import android.widget.ProgressBar;
+import android.widget.ScrollView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
@@ -46,6 +49,7 @@ import androidx.work.WorkManager;
 import com.google.android.gms.ads.MobileAds;
 
 import java.net.URLEncoder;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
@@ -60,7 +64,14 @@ public class MainActivity extends AppCompatActivity {
 
     private WebView webView;
     private ProgressBar progressBar;
-    private TextView[] navLabels = new TextView[5];
+    private FrameLayout contentFrame;
+    private LinearLayout savedScreen;
+    private LinearLayout savedList;
+
+    private TextView[] navLabels = new TextView[6];
+
+    private boolean savedScreenVisible = false;
+    private int lastWebTabIndex = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +98,13 @@ public class MainActivity extends AppCompatActivity {
                 new OnBackPressedCallback(true) {
                     @Override
                     public void handleOnBackPressed() {
+
+                        if (savedScreenVisible) {
+                            showWebContent();
+                            updateSelectedTab(lastWebTabIndex);
+                            return;
+                        }
+
                         if (webView != null && webView.canGoBack()) {
                             webView.goBack();
                         } else {
@@ -127,7 +145,6 @@ public class MainActivity extends AppCompatActivity {
         header.setPadding(dp(16), dp(10), dp(12), dp(10));
         header.setBackgroundColor(Color.rgb(11, 35, 69));
 
-        // Official JobAlertzNg logo.
         ImageView logo = new ImageView(this);
         logo.setImageResource(R.drawable.jobalertzng_logo);
         logo.setScaleType(ImageView.ScaleType.FIT_CENTER);
@@ -155,8 +172,6 @@ public class MainActivity extends AppCompatActivity {
         brand.addView(name);
         brand.addView(tagline);
 
-        // Brand now uses the remaining header space.
-        // The nonfunctional search button has been removed.
         header.addView(brand,
                 new LinearLayout.LayoutParams(
                         0,
@@ -195,9 +210,27 @@ public class MainActivity extends AppCompatActivity {
                         dp(3)
                 ));
 
+        contentFrame = new FrameLayout(this);
+
         webView = new WebView(this);
 
-        root.addView(webView,
+        contentFrame.addView(webView,
+                new FrameLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT
+                ));
+
+        savedScreen = buildSavedScreen();
+
+        contentFrame.addView(savedScreen,
+                new FrameLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT
+                ));
+
+        savedScreen.setVisibility(View.GONE);
+
+        root.addView(contentFrame,
                 new LinearLayout.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         0,
@@ -209,10 +242,12 @@ public class MainActivity extends AppCompatActivity {
         nav.setGravity(Gravity.CENTER);
         nav.setBackgroundColor(Color.WHITE);
         nav.setElevation(dp(8));
-        nav.setPadding(dp(3), dp(5), dp(3), dp(5));
+        nav.setPadding(dp(2), dp(5), dp(2), dp(5));
 
-        String[] icons = {"⌂", "▦", "✦", "▤", "•••"};
-        String[] labels = {"Home", "Jobs", "Career", "Stories", "More"};
+        String[] icons = {"⌂", "▦", "✦", "▤", "♡", "•••"};
+        String[] labels = {
+                "Home", "Jobs", "Career", "Stories", "Saved", "More"
+        };
 
         for (int i = 0; i < labels.length; i++) {
 
@@ -228,13 +263,13 @@ public class MainActivity extends AppCompatActivity {
 
             TextView icon = new TextView(this);
             icon.setText(icons[i]);
-            icon.setTextSize(i == 4 ? 17 : 21);
+            icon.setTextSize(i == 5 ? 17 : 21);
             icon.setGravity(Gravity.CENTER);
             icon.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
 
             TextView label = new TextView(this);
             label.setText(labels[i]);
-            label.setTextSize(10);
+            label.setTextSize(9);
             label.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
             label.setGravity(Gravity.CENTER);
             label.setPadding(0, dp(2), 0, 0);
@@ -273,7 +308,6 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(root);
 
-        // Keep app content between Android system bars.
         ViewCompat.setOnApplyWindowInsetsListener(root, (view, windowInsets) -> {
 
             Insets systemBars = windowInsets.getInsets(
@@ -295,6 +329,185 @@ public class MainActivity extends AppCompatActivity {
         updateSelectedTab(0);
     }
 
+    private LinearLayout buildSavedScreen() {
+
+        LinearLayout screen = new LinearLayout(this);
+        screen.setOrientation(LinearLayout.VERTICAL);
+        screen.setBackgroundColor(Color.rgb(245, 248, 251));
+        screen.setPadding(dp(16), dp(18), dp(16), dp(12));
+
+        TextView heading = new TextView(this);
+        heading.setText("Saved Jobs");
+        heading.setTextColor(Color.rgb(16, 45, 86));
+        heading.setTextSize(23);
+        heading.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+
+        screen.addView(heading);
+
+        TextView description = new TextView(this);
+        description.setText("Your bookmarked opportunities, saved on this device.");
+        description.setTextColor(Color.rgb(95, 108, 124));
+        description.setTextSize(12);
+        description.setPadding(0, dp(5), 0, dp(14));
+
+        screen.addView(description);
+
+        ScrollView scrollView = new ScrollView(this);
+
+        savedList = new LinearLayout(this);
+        savedList.setOrientation(LinearLayout.VERTICAL);
+
+        scrollView.addView(savedList);
+
+        screen.addView(scrollView,
+                new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        0,
+                        1
+                ));
+
+        return screen;
+    }
+
+    private void refreshSavedJobs() {
+
+        if (savedList == null) return;
+
+        savedList.removeAllViews();
+
+        List<SavedJobStore.SavedJob> jobs =
+                SavedJobStore.getAll(this);
+
+        if (jobs.isEmpty()) {
+
+            TextView empty = new TextView(this);
+            empty.setText(
+                    "You haven't saved any jobs yet.\n\n"
+                    + "Open a vacancy and tap the Save Job button "
+                    + "to keep it here."
+            );
+            empty.setTextColor(Color.rgb(90, 105, 122));
+            empty.setTextSize(14);
+            empty.setGravity(Gravity.CENTER);
+            empty.setPadding(dp(20), dp(45), dp(20), dp(45));
+            empty.setBackground(makeRounded(Color.WHITE, 12));
+
+            savedList.addView(empty);
+            return;
+        }
+
+        for (SavedJobStore.SavedJob job : jobs) {
+
+            LinearLayout card = new LinearLayout(this);
+            card.setOrientation(LinearLayout.VERTICAL);
+            card.setPadding(dp(14), dp(13), dp(14), dp(13));
+            card.setBackground(makeRounded(Color.WHITE, 12));
+
+            LinearLayout.LayoutParams cardParams =
+                    new LinearLayout.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT
+                    );
+
+            cardParams.bottomMargin = dp(10);
+
+            TextView title = new TextView(this);
+            title.setText(job.title);
+            title.setTextColor(Color.rgb(16, 45, 86));
+            title.setTextSize(15);
+            title.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+
+            card.addView(title);
+
+            TextView address = new TextView(this);
+            address.setText(job.url);
+            address.setTextColor(Color.rgb(120, 130, 145));
+            address.setTextSize(10);
+            address.setPadding(0, dp(5), 0, dp(10));
+
+            card.addView(address);
+
+            LinearLayout actions = new LinearLayout(this);
+            actions.setOrientation(LinearLayout.HORIZONTAL);
+            actions.setGravity(Gravity.CENTER_VERTICAL);
+
+            TextView open = new TextView(this);
+            open.setText("OPEN JOB");
+            open.setTextColor(Color.WHITE);
+            open.setTextSize(11);
+            open.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+            open.setGravity(Gravity.CENTER);
+            open.setPadding(dp(16), dp(9), dp(16), dp(9));
+            open.setBackground(makeRounded(Color.rgb(0, 131, 77), 8));
+
+            open.setOnClickListener(v -> {
+                loadPage(job.url, "Home");
+            });
+
+            TextView remove = new TextView(this);
+            remove.setText("REMOVE");
+            remove.setTextColor(Color.rgb(180, 55, 55));
+            remove.setTextSize(11);
+            remove.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+            remove.setGravity(Gravity.CENTER);
+            remove.setPadding(dp(16), dp(9), dp(16), dp(9));
+            remove.setBackground(makeRounded(Color.rgb(253, 238, 238), 8));
+
+            LinearLayout.LayoutParams removeParams =
+                    new LinearLayout.LayoutParams(
+                            ViewGroup.LayoutParams.WRAP_CONTENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT
+                    );
+
+            removeParams.leftMargin = dp(10);
+
+            remove.setOnClickListener(v -> {
+
+                SavedJobStore.remove(this, job.url);
+                refreshSavedJobs();
+
+                Toast.makeText(
+                        this,
+                        "Job removed from Saved Jobs.",
+                        Toast.LENGTH_SHORT
+                ).show();
+            });
+
+            actions.addView(open);
+            actions.addView(remove, removeParams);
+
+            card.addView(actions);
+
+            savedList.addView(card, cardParams);
+        }
+    }
+
+    private void showSavedScreen() {
+
+        lastWebTabIndex = getSelectedWebTab();
+        savedScreenVisible = true;
+
+        webView.setVisibility(View.GONE);
+        savedScreen.setVisibility(View.VISIBLE);
+
+        progressBar.setVisibility(View.GONE);
+
+        refreshSavedJobs();
+        updateSelectedTab(4);
+    }
+
+    private void showWebContent() {
+
+        savedScreenVisible = false;
+
+        savedScreen.setVisibility(View.GONE);
+        webView.setVisibility(View.VISIBLE);
+    }
+
+    private int getSelectedWebTab() {
+        return lastWebTabIndex;
+    }
+
     private void configureWebView() {
 
         WebSettings settings = webView.getSettings();
@@ -311,15 +524,16 @@ public class MainActivity extends AppCompatActivity {
                 WebSettings.MIXED_CONTENT_NEVER_ALLOW
         );
 
-        // Allow third-party cookies needed by advertising services.
         CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true);
 
-        // Allow HTML video playback without requiring a tap.
         settings.setMediaPlaybackRequiresUserGesture(false);
 
-        // Register this WebView with Google's WebView API for Ads.
-        // This must run on the main Android thread.
         MobileAds.registerWebView(webView);
+
+        webView.addJavascriptInterface(
+                new SavedJobsBridge(),
+                "AndroidSavedJobs"
+        );
 
         webView.setBackgroundColor(Color.WHITE);
 
@@ -340,6 +554,12 @@ public class MainActivity extends AppCompatActivity {
             ) {
                 return routeUrl(Uri.parse(url));
             }
+
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                injectSaveJobButton();
+            }
         });
 
         webView.setWebChromeClient(new WebChromeClient() {
@@ -354,6 +574,113 @@ public class MainActivity extends AppCompatActivity {
                 );
             }
         });
+    }
+
+    private void injectSaveJobButton() {
+
+        if (webView == null || !isJobPostUrl(webView.getUrl())) {
+            return;
+        }
+
+        String script =
+                "(function(){"
+                + "if(document.getElementById('janz-native-save-job'))return;"
+                + "var b=document.createElement('button');"
+                + "b.id='janz-native-save-job';"
+                + "b.type='button';"
+                + "b.style.cssText='position:fixed;right:16px;bottom:18px;"
+                + "z-index:2147483647;border:0;border-radius:30px;"
+                + "padding:13px 19px;background:#00834D;color:#fff;"
+                + "font-size:14px;font-weight:700;"
+                + "box-shadow:0 3px 12px rgba(0,0,0,.25);';"
+                + "var title=document.querySelector('h1.post-title, "
+                + "h1.entry-title, .post-title, h1');"
+                + "var jobTitle=title?title.innerText.trim():document.title;"
+                + "function update(){"
+                + "try{b.innerText=AndroidSavedJobs.isSaved(location.href)"
+                + "?'Saved ✓':'Save Job ♡';}catch(e){b.innerText='Save Job ♡';}"
+                + "}"
+                + "b.onclick=function(){"
+                + "try{"
+                + "var state=AndroidSavedJobs.toggleJob(jobTitle,location.href);"
+                + "b.innerText=state?'Saved ✓':'Save Job ♡';"
+                + "}catch(e){b.innerText='Unable to save';}"
+                + "};"
+                + "document.body.appendChild(b);"
+                + "update();"
+                + "})();";
+
+        webView.evaluateJavascript(script, null);
+    }
+
+    private boolean isJobPostUrl(String value) {
+
+        if (!isTrustedBlogUrl(value)) return false;
+
+        try {
+            String path = Uri.parse(value).getPath();
+
+            return path != null
+                    && path.matches("/[0-9]{4}/[0-9]{1,2}/.+\\.html");
+
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private class SavedJobsBridge {
+
+        @JavascriptInterface
+        public boolean isSaved(String url) {
+
+            if (!isJobPostUrl(url)) return false;
+
+            return SavedJobStore.isSaved(
+                    MainActivity.this,
+                    url
+            );
+        }
+
+        @JavascriptInterface
+        public boolean toggleJob(String title, String url) {
+
+            if (!isJobPostUrl(url)) return false;
+
+            boolean saved;
+
+            if (SavedJobStore.isSaved(MainActivity.this, url)) {
+
+                SavedJobStore.remove(MainActivity.this, url);
+                saved = false;
+
+            } else {
+
+                saved = SavedJobStore.save(
+                        MainActivity.this,
+                        title,
+                        url
+                );
+            }
+
+            final boolean result = saved;
+
+            runOnUiThread(() -> {
+
+                Toast.makeText(
+                        MainActivity.this,
+                        result
+                                ? "Job saved successfully."
+                                : "Unable to save this job.",
+                        Toast.LENGTH_SHORT
+                ).show();
+
+                if (savedScreenVisible) {
+                    refreshSavedJobs();
+                }
+            });
+
+            return saved;
+        }
     }
 
     private boolean routeUrl(Uri uri) {
@@ -389,6 +716,7 @@ public class MainActivity extends AppCompatActivity {
     private void handleNavigation(int index, View anchor) {
 
         switch (index) {
+
             case 0:
                 loadPage(HOME, "Home");
                 break;
@@ -406,6 +734,10 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case 4:
+                showSavedScreen();
+                break;
+
+            case 5:
                 showMoreMenu(anchor);
                 break;
         }
@@ -457,7 +789,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void showMoreMenu(View anchor) {
 
-        updateSelectedTab(4);
+        updateSelectedTab(5);
 
         PopupMenu menu = new PopupMenu(this, anchor);
 
@@ -534,10 +866,14 @@ public class MainActivity extends AppCompatActivity {
             url = HOME;
         }
 
+        showWebContent();
+
         int selected = "Home".equals(tab) ? 0
                 : "Jobs".equals(tab) ? 1
                 : "Career".equals(tab) ? 2
-                : "Stories".equals(tab) ? 3 : 4;
+                : "Stories".equals(tab) ? 3 : 0;
+
+        lastWebTabIndex = selected;
 
         updateSelectedTab(selected);
         webView.loadUrl(url);
