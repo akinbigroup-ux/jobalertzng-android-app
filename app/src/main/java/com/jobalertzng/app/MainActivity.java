@@ -3,6 +3,7 @@ package com.jobalertzng.app;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -16,6 +17,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
+import android.view.animation.DecelerateInterpolator;
 import android.webkit.CookieManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
@@ -26,7 +30,6 @@ import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -56,12 +59,23 @@ import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String HOME = "https://www.jobalertz.com.ng/";
-    private static final String CAREER = "https://www.jobalertz.com.ng/search/label/Career%20Advice";
-    private static final String STORIES = "https://www.jobalertz.com.ng/p/beyond-office-series.html";
-    private static final String EXPIRED = "https://www.jobalertz.com.ng/p/expired-jobs.html";
-    private static final String CLOSING = "https://www.jobalertz.com.ng/p/deadline-approaching-vacancies.html";
+    private static final String HOME =
+            "https://www.jobalertz.com.ng/";
+
+    private static final String CAREER =
+            "https://www.jobalertz.com.ng/search/label/Career%20Advice";
+
+    private static final String STORIES =
+            "https://www.jobalertz.com.ng/p/beyond-office-series.html";
+
+    private static final String EXPIRED =
+            "https://www.jobalertz.com.ng/p/expired-jobs.html";
+
+    private static final String CLOSING =
+            "https://www.jobalertz.com.ng/p/deadline-approaching-vacancies.html";
+
     private static final String HOST = "www.jobalertz.com.ng";
+
     private static final int NOTIFICATION_PERMISSION_REQUEST = 4102;
 
     private WebView webView;
@@ -89,7 +103,8 @@ public class MainActivity extends AppCompatActivity {
         requestNotificationPermissionIfNeeded();
 
         String notificationUrl = getIntent() != null
-                ? getIntent().getStringExtra(PostCheckWorker.EXTRA_POST_URL) : null;
+                ? getIntent().getStringExtra(PostCheckWorker.EXTRA_POST_URL)
+                : null;
 
         loadPage(
                 isTrustedBlogUrl(notificationUrl) ? notificationUrl : HOME,
@@ -247,6 +262,7 @@ public class MainActivity extends AppCompatActivity {
         nav.setPadding(dp(2), dp(5), dp(2), dp(5));
 
         String[] icons = {"⌂", "▦", "✦", "▤", "♡", "•••"};
+
         String[] labels = {
                 "Home", "Jobs", "Career", "Stories", "Saved", "More"
         };
@@ -332,7 +348,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Pull-to-refresh container.
-    // It intercepts only a downward gesture when the WebView is at the top.
     private class PullToRefreshFrameLayout extends FrameLayout {
 
         private float startX;
@@ -453,7 +468,9 @@ public class MainActivity extends AppCompatActivity {
         screen.addView(heading);
 
         TextView description = new TextView(this);
-        description.setText("Your bookmarked opportunities, saved on this device.");
+        description.setText(
+                "Your bookmarked opportunities, saved on this device."
+        );
         description.setTextColor(Color.rgb(95, 108, 124));
         description.setTextSize(12);
         description.setPadding(0, dp(5), 0, dp(14));
@@ -896,110 +913,285 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // Premium Jobs menu.
     private void showJobsMenu(View anchor) {
 
         updateSelectedTab(1);
 
-        PopupMenu menu = new PopupMenu(this, anchor);
-
-        menu.getMenu().add(0, 1, 0, "Lagos Jobs");
-        menu.getMenu().add(0, 2, 1, "Abuja Jobs");
-        menu.getMenu().add(0, 3, 2, "Other States");
-        menu.getMenu().add(0, 4, 3, "Closing Soon");
-        menu.getMenu().add(0, 5, 4, "Expired Jobs");
-
-        menu.setOnMenuItemClickListener(item -> {
-
-            switch (item.getItemId()) {
-
-                case 1:
-                    loadPage(labelUrl("Lagos"), "Jobs");
-                    return true;
-
-                case 2:
-                    loadPage(labelUrl("Abuja"), "Jobs");
-                    return true;
-
-                case 3:
-                    loadPage(labelUrl("Others"), "Jobs");
-                    return true;
-
-                case 4:
-                    loadPage(CLOSING, "Jobs");
-                    return true;
-
-                case 5:
-                    loadPage(EXPIRED, "Jobs");
-                    return true;
-
-                default:
-                    return false;
-            }
-        });
-
-        menu.show();
+        showPremiumMenu(
+                "Explore Jobs",
+                "Find opportunities across Nigeria",
+                new String[]{
+                        "Lagos Jobs",
+                        "Abuja Jobs",
+                        "Other States",
+                        "Closing Soon",
+                        "Expired Jobs"
+                },
+                new String[]{"⌖", "⌖", "◎", "◷", "✓"},
+                new Runnable[]{
+                        () -> loadPage(labelUrl("Lagos"), "Jobs"),
+                        () -> loadPage(labelUrl("Abuja"), "Jobs"),
+                        () -> loadPage(labelUrl("Others"), "Jobs"),
+                        () -> loadPage(CLOSING, "Jobs"),
+                        () -> loadPage(EXPIRED, "Jobs")
+                }
+        );
     }
 
+    // Premium More menu.
     private void showMoreMenu(View anchor) {
 
         updateSelectedTab(5);
 
-        PopupMenu menu = new PopupMenu(this, anchor);
+        showPremiumMenu(
+                "More from JobAlertzNg",
+                "More resources to support your career",
+                new String[]{
+                        "Interview Experiences",
+                        "Job Stories",
+                        "About Us",
+                        "Contact Us",
+                        "Advertise a Job",
+                        "Privacy Policy",
+                        "Terms of Service",
+                        "Disclaimer"
+                },
+                new String[]{"▤", "✦", "ⓘ", "✉", "＋", "▣", "≡", "✓"},
+                new Runnable[]{
+                        () -> loadPage(labelUrl("Interview Experiences"), "More"),
+                        () -> loadPage(labelUrl("Job Stories"), "More"),
+                        () -> loadPage(HOME + "p/about-us.html", "More"),
+                        () -> loadPage(HOME + "p/contact-us.html", "More"),
+                        () -> {
+                            try {
+                                startActivity(new Intent(
+                                        Intent.ACTION_SENDTO,
+                                        Uri.parse("mailto:info@jobalertz.com.ng?subject=Job%20Advertisement%20Enquiry")
+                                ));
+                            } catch (ActivityNotFoundException e) {
+                                Toast.makeText(
+                                        this,
+                                        "No email app is available.",
+                                        Toast.LENGTH_SHORT
+                                ).show();
+                            }
+                        },
+                        () -> loadPage(HOME + "p/privacy-policy.html", "More"),
+                        () -> loadPage(HOME + "p/terms-of-service.html", "More"),
+                        () -> loadPage(HOME + "p/disclaimer.html", "More")
+                }
+        );
+    }
 
-        menu.getMenu().add(0, 1, 0, "Interview Experiences");
-        menu.getMenu().add(0, 2, 1, "Job Stories");
-        menu.getMenu().add(0, 3, 2, "About Us");
-        menu.getMenu().add(0, 4, 3, "Contact Us");
-        menu.getMenu().add(0, 5, 4, "Advertise a Job");
-        menu.getMenu().add(0, 6, 5, "Privacy Policy");
-        menu.getMenu().add(0, 7, 6, "Terms of Service");
-        menu.getMenu().add(0, 8, 7, "Disclaimer");
+    // Custom animated premium bottom menu.
+    private void showPremiumMenu(
+            String heading,
+            String subtitle,
+            String[] itemNames,
+            String[] symbols,
+            Runnable[] actions
+    ) {
 
-        menu.setOnMenuItemClickListener(item -> {
+        Dialog dialog = new Dialog(this);
 
-            switch (item.getItemId()) {
+        LinearLayout panel = new LinearLayout(this);
+        panel.setOrientation(LinearLayout.VERTICAL);
+        panel.setPadding(dp(18), dp(12), dp(18), dp(18));
+        panel.setBackground(makeRounded(Color.WHITE, 24));
+        panel.setElevation(dp(16));
 
-                case 1:
-                    loadPage(labelUrl("Interview Experiences"), "More");
-                    return true;
+        // Drag handle.
+        TextView handle = new TextView(this);
+        handle.setBackground(makeRounded(
+                Color.rgb(190, 201, 215), 20
+        ));
 
-                case 2:
-                    loadPage(labelUrl("Job Stories"), "More");
-                    return true;
+        LinearLayout.LayoutParams handleParams =
+                new LinearLayout.LayoutParams(dp(42), dp(5));
 
-                case 3:
-                    loadPage(HOME + "p/about-us.html", "More");
-                    return true;
+        handleParams.gravity = Gravity.CENTER;
+        handleParams.bottomMargin = dp(17);
 
-                case 4:
-                    loadPage(HOME + "p/contact-us.html", "More");
-                    return true;
+        panel.addView(handle, handleParams);
 
-                case 5:
-                    startActivity(new Intent(
-                            Intent.ACTION_SENDTO,
-                            Uri.parse("mailto:info@jobalertz.com.ng?subject=Job%20Advertisement%20Enquiry")
+        // Heading.
+        TextView title = new TextView(this);
+        title.setText(heading);
+        title.setTextColor(Color.rgb(11, 35, 69));
+        title.setTextSize(20);
+        title.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+
+        panel.addView(title);
+
+        // Subtitle.
+        TextView description = new TextView(this);
+        description.setText(subtitle);
+        description.setTextColor(Color.rgb(112, 125, 143));
+        description.setTextSize(12);
+        description.setPadding(0, dp(4), 0, dp(17));
+
+        panel.addView(description);
+
+        // Scrollable menu options.
+        ScrollView scrollView = new ScrollView(this);
+        scrollView.setFillViewport(false);
+        scrollView.setVerticalScrollBarEnabled(false);
+
+        LinearLayout menuItems = new LinearLayout(this);
+        menuItems.setOrientation(LinearLayout.VERTICAL);
+
+        for (int i = 0; i < itemNames.length; i++) {
+
+            final int position = i;
+
+            LinearLayout row = new LinearLayout(this);
+            row.setOrientation(LinearLayout.HORIZONTAL);
+            row.setGravity(Gravity.CENTER_VERTICAL);
+            row.setPadding(dp(12), dp(8), dp(12), dp(8));
+            row.setBackground(makeRounded(
+                    Color.rgb(246, 249, 252), 14
+            ));
+            row.setClickable(true);
+            row.setFocusable(true);
+            row.setElevation(dp(1));
+
+            // Circular navy icon.
+            TextView icon = new TextView(this);
+            icon.setText(symbols[i]);
+            icon.setTextColor(Color.WHITE);
+            icon.setTextSize(19);
+            icon.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+            icon.setGravity(Gravity.CENTER);
+            icon.setBackground(makeRounded(
+                    Color.rgb(16, 45, 86), 30
+            ));
+
+            row.addView(icon,
+                    new LinearLayout.LayoutParams(dp(40), dp(40)));
+
+            // Menu option text.
+            TextView name = new TextView(this);
+            name.setText(itemNames[i]);
+            name.setTextColor(Color.rgb(25, 43, 67));
+            name.setTextSize(14);
+            name.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+            name.setPadding(dp(13), 0, dp(5), 0);
+
+            row.addView(name,
+                    new LinearLayout.LayoutParams(
+                            0,
+                            ViewGroup.LayoutParams.WRAP_CONTENT,
+                            1
                     ));
-                    return true;
 
-                case 6:
-                    loadPage(HOME + "p/privacy-policy.html", "More");
-                    return true;
+            // Right arrow.
+            TextView arrow = new TextView(this);
+            arrow.setText("›");
+            arrow.setTextColor(Color.rgb(0, 131, 77));
+            arrow.setTextSize(27);
+            arrow.setGravity(Gravity.CENTER);
 
-                case 7:
-                    loadPage(HOME + "p/terms-of-service.html", "More");
-                    return true;
+            row.addView(arrow,
+                    new LinearLayout.LayoutParams(dp(25), dp(40)));
 
-                case 8:
-                    loadPage(HOME + "p/disclaimer.html", "More");
-                    return true;
+            LinearLayout.LayoutParams rowParams =
+                    new LinearLayout.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            dp(56)
+                    );
 
-                default:
-                    return false;
-            }
-        });
+            rowParams.bottomMargin = dp(8);
 
-        menu.show();
+            row.setOnClickListener(v -> {
+                dialog.dismiss();
+                actions[position].run();
+            });
+
+            menuItems.addView(row, rowParams);
+        }
+
+        scrollView.addView(menuItems);
+
+        int scrollHeight = Math.min(420, itemNames.length * 64);
+
+        panel.addView(scrollView,
+                new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        dp(scrollHeight)
+                ));
+
+        // Close button.
+        TextView close = new TextView(this);
+        close.setText("×    Close Menu");
+        close.setTextColor(Color.rgb(16, 45, 86));
+        close.setTextSize(14);
+        close.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        close.setGravity(Gravity.CENTER);
+        close.setBackground(makeRounded(
+                Color.rgb(235, 241, 249), 14
+        ));
+        close.setPadding(0, dp(13), 0, dp(13));
+
+        LinearLayout.LayoutParams closeParams =
+                new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                );
+
+        closeParams.topMargin = dp(10);
+
+        close.setOnClickListener(v -> dialog.dismiss());
+
+        panel.addView(close, closeParams);
+
+        dialog.setContentView(panel);
+        dialog.setCancelable(true);
+        dialog.setCanceledOnTouchOutside(true);
+
+        Window window = dialog.getWindow();
+
+        if (window != null) {
+            window.setBackgroundDrawableResource(
+                    android.R.color.transparent
+            );
+
+            window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+            window.setDimAmount(0.45f);
+            window.setGravity(Gravity.BOTTOM);
+
+            WindowManager.LayoutParams params = window.getAttributes();
+            params.width = WindowManager.LayoutParams.MATCH_PARENT;
+            params.height = WindowManager.LayoutParams.WRAP_CONTENT;
+            params.gravity = Gravity.BOTTOM;
+
+            window.setAttributes(params);
+        }
+
+        // Start slightly below its final position.
+        panel.setTranslationY(dp(90));
+        panel.setAlpha(0.85f);
+
+        dialog.show();
+
+        // Set window size after showing the dialog.
+        if (dialog.getWindow() != null) {
+
+            dialog.getWindow().setLayout(
+                    WindowManager.LayoutParams.MATCH_PARENT,
+                    WindowManager.LayoutParams.WRAP_CONTENT
+            );
+
+            dialog.getWindow().setGravity(Gravity.BOTTOM);
+        }
+
+        // Smooth slide-up animation.
+        panel.animate()
+                .translationY(0)
+                .alpha(1f)
+                .setDuration(280)
+                .setInterpolator(new DecelerateInterpolator())
+                .start();
     }
 
     private String labelUrl(String label) {
@@ -1024,7 +1216,8 @@ public class MainActivity extends AppCompatActivity {
         int selected = "Home".equals(tab) ? 0
                 : "Jobs".equals(tab) ? 1
                 : "Career".equals(tab) ? 2
-                : "Stories".equals(tab) ? 3 : 0;
+                : "Stories".equals(tab) ? 3
+                : "More".equals(tab) ? 5 : 0;
 
         lastWebTabIndex = selected;
 
