@@ -14,8 +14,6 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
@@ -157,26 +155,14 @@ public class MainActivity extends AppCompatActivity {
         brand.addView(name);
         brand.addView(tagline);
 
+        // Brand now uses the remaining header space.
+        // The nonfunctional search button has been removed.
         header.addView(brand,
                 new LinearLayout.LayoutParams(
                         0,
                         ViewGroup.LayoutParams.WRAP_CONTENT,
                         1
                 ));
-
-        Button search = new Button(this);
-        search.setText("SEARCH");
-        search.setTextSize(10);
-        search.setTextColor(Color.rgb(11, 35, 69));
-        search.setAllCaps(true);
-        search.setPadding(dp(8), 0, dp(8), 0);
-        search.setMinWidth(0);
-        search.setMinHeight(dp(36));
-        search.setBackground(makeRounded(Color.rgb(255, 209, 42), 18));
-        search.setOnClickListener(v -> showSearchDialog());
-
-        header.addView(search,
-                new LinearLayout.LayoutParams(dp(78), dp(36)));
 
         root.addView(header,
                 new LinearLayout.LayoutParams(
@@ -583,39 +569,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
-    }
-
-    private void showSearchDialog() {
-
-        EditText input = new EditText(this);
-        input.setSingleLine(true);
-        input.setHint("Job title, keyword or location");
-        input.setPadding(dp(14), dp(10), dp(14), dp(10));
-
-        new AlertDialog.Builder(this)
-                .setTitle("Search JobAlertzNg")
-                .setView(input)
-                .setNegativeButton("Cancel",
-                        (d, w) -> d.dismiss())
-                .setPositiveButton("Search", (d, w) -> {
-
-                    String query = input.getText().toString().trim();
-
-                    if (!query.isEmpty()) {
-
-                        try {
-                            loadPage(
-                                    HOME + "?q="
-                                            + URLEncoder.encode(query, "UTF-8"),
-                                    "Home"
-                            );
-
-                        } catch (Exception ignored) {
-                            loadPage(HOME, "Home");
-                        }
-                    }
-                })
-                .show();
     }
 
     private void schedulePostChecks() {
