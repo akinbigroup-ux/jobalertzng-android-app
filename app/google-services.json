@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1039645146675",
+    "project_id": "jobalertzng",
+    "storage_bucket": "jobalertzng.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1039645146675:android:8ff07a82e5094749a46d46",
+        "android_client_info": {
+          "package_name": "com.jobalertzng.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAJvVemO_tL8sFjnfV99O7Ocgv0lEL0CqA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
