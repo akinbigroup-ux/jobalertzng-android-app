@@ -5,31 +5,28 @@
     android:viewportWidth="24"
     android:viewportHeight="24">
 
-    <!-- J letter -->
+    <!-- Premium J monogram -->
     <path
         android:fillColor="#FFFFFFFF"
-        android:pathData="M3,4 H10 V15.5
-            C10,19 7.8,21 4.8,21
-            C3,21 1.8,20.4 1,19.4
-            L3.2,16.9
-            C3.7,17.5 4.2,17.8 5,17.8
-            C6.3,17.8 7,17 7,15.5
-            V7.5 H3 Z" />
+        android:pathData="M3.5,4 H10.5 V14.8
+            C10.5,18.8 8.2,21 4.9,21
+            C3.1,21 1.8,20.3 1,19
+            L3.2,16.7
+            C3.7,17.3 4.2,17.6 5,17.6
+            C6.5,17.6 7.2,16.6 7.2,14.8
+            V7.2 H3.5 Z" />
 
-    <!-- A letter left stroke -->
+    <!-- Premium A monogram -->
     <path
         android:fillColor="#FFFFFFFF"
-        android:pathData="M15.5,4 H18.5
-            L23,20 H19.5
-            L18.7,16.8 H14.9
-            L14,20 H10.5 Z" />
+        android:pathData="M15.2,4 H18.2 L23,20.5
+            H19.5 L18.6,17.1
+            H14.7 L13.8,20.5
+            H10.4 Z" />
 
-    <!-- A letter crossbar -->
+    <!-- Refined A crossbar -->
     <path
-        android:fillColor="#00000000"
-        android:strokeColor="#FFFFFFFF"
-        android:strokeWidth="2"
-        android:strokeLineCap="square"
-        android:pathData="M13.7,13.8 H19.3" />
+        android:fillColor="#102D56"
+        android:pathData="M15.5,14.2 H17.9 L16.7,9.5 Z" />
 
 </vector>
