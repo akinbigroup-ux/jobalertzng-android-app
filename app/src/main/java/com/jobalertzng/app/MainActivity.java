@@ -97,6 +97,10 @@ public class MainActivity extends AppCompatActivity {
         getWindow().setNavigationBarColor(Color.rgb(11, 35, 69));
 
         createNotificationChannel();
+
+        // Register this device with Firebase for push notifications.
+        FirebaseTokenManager.register();
+
         buildInterface();
         configureWebView();
         schedulePostChecks();
