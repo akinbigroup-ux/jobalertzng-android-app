@@ -1,6 +1,7 @@
 
 plugins {
     id 'com.android.application'
+    id 'com.google.gms.google-services'
 }
 
 android {
@@ -38,9 +39,13 @@ dependencies {
     implementation 'androidx.core:core:1.15.0'
     implementation 'androidx.work:work-runtime:2.10.0'
 
-    // Google Mobile Ads SDK for WebView Ads integration
+    // Google Mobile Ads SDK
     implementation 'com.google.android.gms:play-services-ads:25.5.0'
 
-    // Guava library required by WorkManager ListenableFuture
+    // Guava library
     implementation 'com.google.guava:guava:33.3.1-android'
+
+    // Firebase SDK
+    implementation platform('com.google.firebase:firebase-bom:35.2.0')
+    implementation 'com.google.firebase:firebase-messaging'
 }
